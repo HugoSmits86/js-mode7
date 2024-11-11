@@ -6,6 +6,10 @@ This project is a software-rendered Mode 7 demo using JavaScript and the HTML5 C
 
 The demo renders two horizontal pixels at a time. If you wish to modify this, remember to update the ```can.width / 4``` sections accordingly. Adjusting the horizon and scale factor allows you to change the perspective for different visual effects.
 
+# Live demo
+
+A live demo is available at [https://www.hugosmits.nl/mode7](https://www.hugosmits.nl/mode7).
+
 # Assets
 
 The texture and sprite are sourced from the intro of the SNES game Demon’s Crest. The texture has been converted into a texture array and a palette array to optimize drawing performance.
