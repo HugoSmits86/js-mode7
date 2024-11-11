@@ -1,0 +1,101 @@
+<html>
+	<head></head>
+	<body style="background-color: black; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+		<canvas id="canvas" width="480" height="320" style="border: 1px solid white;"></canvas>
+	</body>
+	<script src="texture.js"></script>
+	<script>
+		const can = document.getElementById('canvas');
+		const ctx = can.getContext('2d');
+		ctx.imageSmoothingEnabled = false;
+
+		let sprite;
+		function init() {
+		    sprite = new Image();
+		    sprite.src = "sprite.png";
+
+		    sprite.onload = () => {
+		        requestAnimationFrame(tick);
+		    }
+		}
+
+		const clear = () => {
+		    ctx.fillStyle = "black";
+		    ctx.fillRect(0, 0, canvas.width, canvas.height);
+		};
+
+		const log_fps = (time) => {
+		    let fps = 1000 / (performance.now() - time);
+		    console.log(`FPS: ${fps.toFixed(2)}`);
+		}
+
+		let camera = { x: 0, y: 0, yaw: 0}
+		const tick = () => {
+		    let time = performance.now();
+
+		    clear();
+
+		    draw_floor();
+		    draw_sprite();
+
+		    camera.x += Math.sin(camera.yaw) * 1.5;
+		    camera.y -= Math.cos(camera.yaw) * 1.5;
+		    camera.yaw += 0.01;
+
+		    log_fps(time);
+		    
+		    requestAnimationFrame(tick);
+		}
+
+		const draw_floor = () => {
+		    const horizon = Math.floor(can.height * 0.7);
+		    const texture_size = 128;
+
+		    for (let y = 0; y < horizon; y++) {
+		        let scale = 24 / (y + 1);
+		   
+		        let ca = Math.cos(camera.yaw) * scale;
+		        let sa = Math.sin(camera.yaw) * scale;
+
+		        let u = (0 - (can.width / 4)) * ca - (y - horizon) * sa;
+		        let v = (0 - (can.width / 4)) * sa + (y - horizon) * ca;
+
+		        ctx.globalAlpha = Math.min(1, y / 2 * 0.05);
+		        for (let x = 0; x < can.width; x += 2) {
+		            let dx = Math.floor(u + camera.x) & (texture_size - 1);
+		            let dy = Math.floor(v + camera.y) & (texture_size - 1);
+
+		            if (palette && texture) {
+						ctx.fillStyle = palette[texture[dy * texture_size + dx]];
+						ctx.fillRect(x, (can.height - horizon) + y, 2, 1);
+		            }
+
+		            u += ca;
+		            v += sa;
+		        }
+		    }
+		}
+
+		let frame = 0;
+		const draw_sprite = () => {
+		    if (!sprite) {
+		        return;
+		    }
+
+		    const sprw = sprite.width;
+		    const scrw = Math.floor(can.height * 0.5);
+
+		    const sx = 0;
+		    const sy = sprw * frame;
+
+		    const dx = (can.width / 2) - (scrw / 2);
+		    const dy = Math.floor(can.height * 0.3);
+
+		    ctx.drawImage(sprite, sx, sy, sprw, sprw, dx, dy, scrw, scrw);
+
+		    frame = (frame + 1) % (sprite.height / sprw);
+		}
+
+		requestAnimationFrame(init);
+	</script>
+</html>
